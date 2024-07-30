@@ -13,6 +13,13 @@ ARG PROC_COUNT=8
 ENV FFMPEG_COMMIT n5.1.3
 ENV FFMPEG_NVCODEC_COMMIT n12.0.16.0
 
+ENV SRT_COMMIT 1.5.3
+RUN wget https://github.com/Haivision/srt/archive/v${SRT_COMMIT}.tar.gz && \
+    tar zxf v${SRT_COMMIT}.tar.gz
+WORKDIR /srt-${SRT_COMMIT}/build
+RUN cmake .. -DCMAKE_INSTALL_PREFIX="/usr/local"
+RUN make && make install
+WORKDIR /
 RUN wget https://github.com/FFmpeg/nv-codec-headers/archive/${FFMPEG_NVCODEC_COMMIT}.tar.gz && \
     tar zxf ${FFMPEG_NVCODEC_COMMIT}.tar.gz
 RUN wget https://github.com/FFmpeg/FFmpeg/archive/${FFMPEG_COMMIT}.tar.gz && \
@@ -60,6 +67,7 @@ RUN ./configure \
         --enable-nvenc \
         --enable-nvdec \
         --enable-libopenmpt \
+        --enable-libsrt \
         --prefix=/opt/ffmpeg \
         && \
     make -j $PROC_COUNT && \
